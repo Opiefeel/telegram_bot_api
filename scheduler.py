@@ -5,15 +5,24 @@ from config import TOKEN
 from telegram import Bot
 from sqlalchemy import select
 
+scheduler = AsyncIOScheduler()
 bot = Bot(token=TOKEN)
 
 
 async def check_payments():
     async with async_session() as session:
-        tomorrow = datetime.now().date() + timedelta(days=1)
+        today = datetime.now().date()
+        tomorrow = today + timedelta(days=1)
+
+        # Ищем платежи на завтра и сегодня
         result = await session.execute(
-            select(Payment).where(Payment.payment_date == tomorrow, Payment.notified == False)
+            select(Payment).where(
+                (Payment.payment_date == tomorrow) |
+                (Payment.payment_date == today),
+                Payment.notified == False
+            )
         )
+
         payments = result.scalars().all()
 
         for payment in payments:
@@ -21,13 +30,18 @@ async def check_payments():
                 select(Student).where(Student.id == payment.student_id)
             )).scalar()
 
+            if payment.payment_date == tomorrow:
+                message = f"Напоминание! Завтра ({tomorrow.strftime('%d-%m-%Y')}) оплата {payment.amount:.2f} руб. для {student.full_name}."
+            else:
+                message = f"Сегодня ({today.strftime('%d-%m-%Y')}) срок оплаты {payment.amount:.2f} руб. для {student.full_name}."
+
             await bot.send_message(
                 chat_id=student.user_id,
-                text=f"Завтра ({tomorrow}) оплата {payment.amount:.2f} руб. для {student.full_name}."
+                text=message
             )
             payment.notified = True
             await session.commit()
 
 
-scheduler = AsyncIOScheduler()
+# Добавляем задачу в планировщик при импорте
 scheduler.add_job(check_payments, 'cron', hour=9, minute=0)

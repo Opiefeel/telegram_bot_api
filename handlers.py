@@ -16,7 +16,7 @@ FULL_NAME, PERCENTAGE, AMOUNT, MONTHS, START_DATE = range(5)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Привет! Давайте добавим ученика. Введите имя и фамилию:")
+    await update.message.reply_text("Привет! Сначала добавим ученика. Введите его имя и фамилию:")
     return FULL_NAME
 
 
@@ -34,13 +34,13 @@ async def full_name(update: Update, context: CallbackContext) -> int:
 async def percentage(update: Update, context: CallbackContext) -> int:
     try:
         percent = int(update.message.text)
-        if not 1 <= percent <= 100:
+        if not 1 <= percent <= 999:
             raise ValueError
         context.user_data['percentage'] = percent
         await update.message.reply_text("Введите сумму на руки (целое число):")
         return AMOUNT
     except ValueError:
-        await update.message.reply_text("Неверный формат! Введите число от 1 до 100")
+        await update.message.reply_text("Неверный формат! Введите число от 1 до 999")
         return PERCENTAGE
 
 
@@ -70,7 +70,8 @@ async def months(update: Update, context: CallbackContext) -> int:
 
 async def start_date(update: Update, context: CallbackContext) -> int:
     try:
-        date = datetime.strptime(update.message.text, "%Y-%m-%d").date()
+        date = datetime.strptime(update.message.text, "%d-%m-%Y").date()
+
         total = (context.user_data['amount'] * context.user_data['percentage'] / 100)
         base_payment = total // context.user_data['months']
         remainder = total % context.user_data['months']
@@ -88,7 +89,7 @@ async def start_date(update: Update, context: CallbackContext) -> int:
             await session.commit()
 
             for i in range(context.user_data['months']):
-                payment_date = date + relativedelta(months=i + 1)
+                payment_date = date + relativedelta(days=30 * (i + 1))
                 amount = base_payment + (remainder if i == context.user_data['months'] - 1 else 0)
                 payment = Payment(
                     student_id=student.id,
@@ -102,9 +103,8 @@ async def start_date(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Ученик добавлен!")
         return ConversationHandler.END
     except ValueError:
-        await update.message.reply_text("Неверный формат даты! Используйте ГГГГ-ММ-ДД")
+        await update.message.reply_text("Неверный формат даты! Используйте ДД-ММ-ГГГГ (например: 31-12-2023)")
         return START_DATE
-
 
 conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
