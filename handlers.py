@@ -49,8 +49,9 @@ async def amount(update: Update, context: CallbackContext) -> int:
         amount = int(update.message.text)
         context.user_data['amount'] = amount
         await update.message.reply_text(
-            "Выберите количество месяцев:",
-            reply_markup=ReplyKeyboardMarkup([['3', '4', '5'], ['Отмена']], resize_keyboard=True)
+            "Выберите количество месяцев на сколько делить оплату:",
+            reply_markup=ReplyKeyboardMarkup([['3', '4', '5'], ['Отмена']], resize_keyboard=True,
+                                             one_time_keyboard=True)
         )
         return MONTHS
     except ValueError:
@@ -61,10 +62,10 @@ async def amount(update: Update, context: CallbackContext) -> int:
 async def months(update: Update, context: CallbackContext) -> int:
     months = update.message.text
     if months not in ['3', '4', '5']:
-        await update.message.reply_text("Выберите 3, 4 или 5")
+        await update.message.reply_text("Выберите 3, 4 или 5, ну пожалуйста")
         return MONTHS
     context.user_data['months'] = int(months)
-    await update.message.reply_text("Введите дату трудоустройства (ГГГГ-ММ-ДД):")
+    await update.message.reply_text("Введите дату трудоустройства (ДД-ММ-ГГГГ (например: 31-12-2023):")
     return START_DATE
 
 
