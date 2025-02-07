@@ -73,7 +73,7 @@ async def amount(update: Update, context: CallbackContext) -> int:
         amount = int(update.message.text)
         context.user_data['amount'] = amount
         await update.message.reply_text(
-            "Выберите количество месяцев:",
+            "Выберите количество месяца:",
             reply_markup=ReplyKeyboardMarkup(
                 [['3', '4', '5'], ['Давай по новой']],
                 resize_keyboard=True,
@@ -114,7 +114,7 @@ async def start_date(update: Update, context: CallbackContext) -> int:
             f"Имя: {context.user_data['full_name']}\n"
             f"Процент: {context.user_data['percentage']}%\n"
             f"Сумма на руки: {context.user_data['amount']} руб.\n"
-            f"Делим на {context.user_data['months']} месяцев\n"
+            f"Делим на {context.user_data['months']} месяца\n"
             f"Дата трудоустройства: {date.strftime('%d-%m-%Y')}\n"
             "\nВсё верно?"
         )
@@ -194,24 +194,19 @@ conv_handler = ConversationHandler(
     entry_points=[CommandHandler('start', start)],
     states={
         FULL_NAME: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, full_name),
-            MessageHandler(filters.Regex(r'^Давай по новой$'), restart)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, full_name)
         ],
         PERCENTAGE: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, percentage),
-            MessageHandler(filters.Regex(r'^Давай по новой$'), restart)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, percentage)
         ],
         AMOUNT: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, amount),
-            MessageHandler(filters.Regex(r'^Давай по новой$'), restart)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, amount)
         ],
         MONTHS: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, months),
-            MessageHandler(filters.Regex(r'^Давай по новой$'), restart)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, months)
         ],
         START_DATE: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, start_date),
-            MessageHandler(filters.Regex(r'^Давай по новой$'), restart)
+            MessageHandler(filters.TEXT & ~filters.COMMAND, start_date)
         ],
         CONFIRMATION: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, confirmation)
