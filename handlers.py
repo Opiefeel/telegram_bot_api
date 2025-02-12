@@ -157,7 +157,7 @@ async def confirmation(update: Update, context: CallbackContext) -> int:
 
                 # Добавляем платежи
                 for i in range(context.user_data['months']):
-                    payment_date = date + relativedelta(days=30 * (i + 1))
+                    payment_date = date + relativedelta(days=30 * (i + 2))
                     amount = base_payment + (remainder if i == context.user_data['months'] - 1 else 0)
                     payment = Payment(
                         student_id=student.id,
@@ -173,7 +173,7 @@ async def confirmation(update: Update, context: CallbackContext) -> int:
                 "✅ Ученик успешно добавлен!\n"
                 "Хотите добавить ещё одного?",
                 reply_markup=ReplyKeyboardMarkup(
-                    [['Добавить ещё одного ученика']],
+                    [['Добавить ещё одного ученикаasfsafasfasf']],
                     resize_keyboard=True,
                     one_time_keyboard=True
                 )
