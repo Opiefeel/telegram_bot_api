@@ -173,7 +173,7 @@ async def confirmation(update: Update, context: CallbackContext) -> int:
                 "✅ Ученик успешно добавлен!\n"
                 "Хотите добавить ещё одного?",
                 reply_markup=ReplyKeyboardMarkup(
-                    [['Добавить ещё одного ученикаasfsafasfasf']],
+                    [['Добавить ещё одного препода']],
                     resize_keyboard=True,
                     one_time_keyboard=True
                 )
